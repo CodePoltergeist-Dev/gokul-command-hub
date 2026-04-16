@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Search, CheckCircle, Eye } from "lucide-react";
+import { Search, CheckCircle, Eye, Download } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "@/components/ui/table";
@@ -43,16 +45,61 @@ export function TrackingTable({ data, onMarkDelivered }: Props) {
     );
   });
 
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const title = "Daily Delivery Report";
+    const dateStr = new Date().toLocaleDateString();
+
+    const total = filtered.length;
+    const completed = filtered.filter((r) => String(r.Status || "").toUpperCase() === "COMPLETED").length;
+    const podCompliant = filtered.filter((r) => r.POD && String(r.POD).trim() !== "").length;
+    const deliveryPct = total ? ((completed / total) * 100).toFixed(1) : "0";
+    const podPct = total ? ((podCompliant / total) * 100).toFixed(1) : "0";
+
+    doc.setFontSize(20);
+    doc.text(title, 14, 22);
+
+    doc.setFontSize(11);
+    doc.text(`Generated: ${dateStr}`, 14, 30);
+    doc.text(`Delivery Complete: ${deliveryPct}% (${completed}/${total})`, 14, 36);
+    doc.text(`POD Compliance: ${podPct}% (${podCompliant}/${total})`, 14, 42);
+
+    const tableData = filtered.map((r, i) => [
+      r["Invoice Date"] ?? "—",
+      r["Delivery Date"] ?? "—",
+      r["Invoice No"] ?? `row-${i}`,
+      r["Custommer Name"] ?? "—",
+      r.Route ?? "—",
+      r["No. of Boxes Invoiced"] ?? "—",
+      r.Status ?? "—",
+      r.POD ? "Yes" : "No"
+    ]);
+
+    autoTable(doc, {
+      startY: 50,
+      head: [["Inv Date", "Del Date", "Inv No", "Customer", "Route", "Boxes", "Status", "POD"]],
+      body: tableData,
+    });
+
+    doc.save(`DDR_Report_${dateStr.replace(/\//g, "-")}.pdf`);
+  };
+
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search invoice or customer…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9"
-        />
+      <div className="flex items-center justify-between gap-4">
+        <div className="relative w-full max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search invoice or customer…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Button variant="outline" className="gap-2" onClick={exportPDF}>
+          <Download className="h-4 w-4" />
+          Export PDF
+        </Button>
       </div>
 
       <div className="rounded-lg border border-border/50 overflow-hidden">

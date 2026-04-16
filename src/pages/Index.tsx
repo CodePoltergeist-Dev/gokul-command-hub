@@ -2,9 +2,11 @@ import { Moon, Sun, RefreshCw, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KPICards } from "@/components/KPICards";
 import { TrackingTable } from "@/components/TrackingTable";
+import { PnLTable } from "@/components/PnLTable";
 import { useLogisticsData } from "@/hooks/useLogisticsData";
 import { useTheme } from "@/hooks/useTheme";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function Index() {
   const { data, loading, error, refetch, markAsDelivered } = useLogisticsData();
@@ -53,10 +55,24 @@ export default function Index() {
             <Skeleton className="h-96 rounded-lg" />
           </div>
         ) : (
-          <>
-            <KPICards data={data} />
-            <TrackingTable data={data} onMarkDelivered={markAsDelivered} />
-          </>
+          <Tabs defaultValue="ddr" className="w-full space-y-6">
+            <div className="flex items-center justify-between">
+              <TabsList className="grid w-full max-w-[400px] grid-cols-2">
+                <TabsTrigger value="ddr">Daily Delivery Report (DDR)</TabsTrigger>
+                <TabsTrigger value="pnl">Profit/Loss (P&L)</TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <TabsContent value="ddr" className="space-y-6">
+              <KPICards data={data} view="ddr" />
+              <TrackingTable data={data} onMarkDelivered={markAsDelivered} />
+            </TabsContent>
+            
+            <TabsContent value="pnl" className="space-y-6">
+              <KPICards data={data} view="pnl" />
+              <PnLTable data={data} />
+            </TabsContent>
+          </Tabs>
         )}
       </main>
     </div>

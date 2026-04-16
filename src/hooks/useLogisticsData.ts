@@ -3,10 +3,25 @@ import { toast } from "@/hooks/use-toast";
 
 export interface LogisticsRecord {
   "Invoice Date"?: string;
+  "Delivery Date"?: string;
   "Invoice No"?: string | number;
   "Custommer Name"?: string;
   Route?: string;
+  "No. of Boxes Invoiced"?: number | string;
   Status?: string;
+  "Return Status"?: string;
+  "Returned Boxes"?: number | string;
+  "Reason for Return"?: string;
+  POD?: string;
+  
+  // PnL info
+  "Total invoice"?: number | string;
+  "Revenue from boxes (in Rs)"?: number | string;
+  "Revenue from Bilty (in Rs)"?: number | string;
+  "Vehicle type"?: string;
+  "Vehicle number"?: string;
+  "Vehicle cost"?: number | string;
+  "Driver Cost"?: number | string;
   [key: string]: unknown;
 }
 
