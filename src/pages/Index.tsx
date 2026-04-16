@@ -21,6 +21,7 @@ export default function Index() {
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight">Logistic Control Center</h1>
+              <p className="text-xs text-muted-foreground">Command Center</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

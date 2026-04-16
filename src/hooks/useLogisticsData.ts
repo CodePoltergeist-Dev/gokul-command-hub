@@ -39,6 +39,7 @@ export function useLogisticsData() {
   }, [fetchData]);
 
   const markAsDelivered = async (invoiceNo: string) => {
+  const markAsDelivered = async (invoiceNo: string) => {
     // Optimistically update the UI to show immediately without waiting or fetching all data again
     setData((prev) => 
       prev.map((item) =>
@@ -61,6 +62,8 @@ export function useLogisticsData() {
       // Revert if API fails
       toast({ title: "Update failed", description: `Could not mark as delivered: ${e.message}`, variant: "destructive" });
       await fetchData();
+    }
+  };
     }
   };
 
