@@ -39,7 +39,21 @@ export function useLogisticsData() {
       const res = await fetch(API_URL);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-      setData(Array.isArray(json) ? json : []);
+      
+      const parsedData = (Array.isArray(json) ? json : []).map((item) => ({
+        ...item,
+        "Invoice Date": item["Invoice date"] ?? item["Invoice Date"],
+        "Delivery Date": item["Delivery date"] ?? item["Delivery Date"],
+        "Invoice No": item["Invoice no"] ?? item["Invoice No"],
+        "Custommer Name": item["Customer name"] ?? item["Custommer Name"],
+        "Route": item["ROUTE"] ?? item.Route ?? item.route,
+        "Status": item["Delivery Status\nCompleted/ Return/ Partial Return"] ?? item["Delivery Status"] ?? item.Status,
+        "Vehicle number": item["Vehicle no"] ?? item["Vehicle number"],
+        "Reason for Return": item["Reason for Return/ Partial Return"] ?? item["Reason for Return"],
+        "Return Status": item["If Return/ Partial Return, No. of boxes"] ?? item["Return Status"],
+      }));
+      
+      setData(parsedData);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Failed to fetch data";
       setError(msg);
